@@ -8,6 +8,10 @@
       width: 360px;
       height: 256px;
       border: 1px solid #aaa;
+      position: relative;
+    }
+    .entity {
+      position: absolute;
     }
     </style>
   </head>
@@ -71,6 +75,7 @@ var manager = require('entity-manager')
 var game = manager()
 game.el = document.getElementById('game')
 
+var v = require('entity-vector')
 var rect = require('entity-rect')
 var sprite = require('entity-css-sprite')('sprite.png', map)
 var loop = require('entity-loop')({ dt: 1000/60 })
@@ -80,20 +85,50 @@ var position = require('entity-position')
 
 var keyboard = require('keyboard')(document)
 
+var move = {
+  update: function (e) {
+    e.setSpriteFace(e.keys)
+    e.vel.set(v(inputMap[e.keys]).mul(2,2))
+  }
+}
+
+var inputMap = {
+   'left': [-1, 0]
+,    'up': [ 0,-1]
+, 'right': [ 1, 0]
+,  'down': [ 0, 1]
+,  'left down': [-0.7, 0.7]
+,    'left up': [-0.7,-0.7]
+, 'right down': [ 0.7, 0.7]
+,   'up right': [ 0.7,-0.7]
+}
+
+var smooth = {
+  render: function (e, a) {
+    e.mesh.pos.set(v(e.prevPos).lerp(e.pos, a))
+  }
+}
+
 var player = game.createEntity(
   dom
 , motion
 , position
+, sprite
+, move
+, smooth
 , {
     mesh: [rect, [0,0], [32,40]]
   , class: [String, 'red']
   }
 )
-player.use(sprite)
 
 game.use(loop)
 game.use(keyboard)
+game.use(position)
 game.use(sprite)
+game.use(move)
+game.use(motion)
+game.use(smooth)
 game.use(dom)
 
 game.on('init', function () {
@@ -101,7 +136,7 @@ game.on('init', function () {
 })
 
 game.on('keys', function (keys) {
-  player.setSpriteFace(keys)
+  player.keys = keys
 })
 
 game.applyComponents()
