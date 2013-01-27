@@ -11,7 +11,7 @@ var map = {
 }
 
 /**
- * keyboard
+ * Keyboard system.
  */
 
 module.exports = function (el) {
@@ -38,12 +38,12 @@ module.exports = function (el) {
       kbd.emit('keys', kbd.getKeys())
       return false
     })
-    
+
   }
 
   kbd.getKeys = function () {
     return Object.keys(kbd.keys)
-      .filter(function (el) { return kbd.keys[el] }, this)
+      .filter(function (el) { return kbd.keys[el] })
       .sort(function (a, b) { return a - b })
       .map(function (el) { return map[el] })
       .join(' ')
