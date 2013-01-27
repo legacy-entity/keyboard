@@ -1,0 +1,19 @@
+{
+  "name": "keyboard",
+  "version": "0.0.1",
+  "description": "keyboard system",
+  "keywords": ["game","keyboard","system","input"],
+  "author": "stagas",
+  "license": "MIT",
+  "development": {
+    "entity/vector": "*",
+    "entity/rect": "*",
+    "entity/css-sprite": "*",
+    "entity/manager": "*",
+    "entity/motion": "*",
+    "entity/position": "*",
+    "entity/loop": "*",
+    "entity/dom": "*"
+  },
+  "scripts": ["index.js"]
+}
