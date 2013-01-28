@@ -80,44 +80,32 @@ game.el = document.getElementById('game')
 
 var v = require('entity-vector')
 var rect = require('entity-rect')
-var sprite = require('entity-css-sprite')('sprite.png', map)
 var loop = require('entity-loop')({ dt: 1000/60 })
 var dom = require('entity-dom')(game.el)
 var motion = require('entity-motion')
 var position = require('entity-position')
+var smooth = require('entity-smooth')
+var directional = require('entity-directional')
+
+var Sprite = require('entity-css-sprite')
+var sprites = {}
+sprites.player = Sprite('sprite.png', map)
 
 var keyboard = require('keyboard')(document)
 
-var move = {
-  update: function (e) {
-    e.setSpriteFace(e.keys)
-    e.vel.set(v(inputMap[e.keys]).mul(2,2))
-  }
-}
-
-var inputMap = {
-   'left': [-1, 0]
-,    'up': [ 0,-1]
-, 'right': [ 1, 0]
-,  'down': [ 0, 1]
-,  'left down': [-0.7, 0.7]
-,    'left up': [-0.7,-0.7]
-, 'right down': [ 0.7, 0.7]
-,   'up right': [ 0.7,-0.7]
-}
-
-var smooth = {
-  render: function (e, a) {
-    e.mesh.pos.set(v(e.prevPos).lerp(e.pos, a))
-  }
+var arrows = require('entity-arrows')(keyboard)
+arrows.setDirection = function (dir) {
+  this.setSpriteFace(dir)
+  this.dir.set(v(this.arrowMap[dir] || 0).mul(2))
 }
 
 var player = game.createEntity(
   dom
 , motion
 , position
-, sprite
-, move
+, sprites.player
+, arrows
+, directional
 , smooth
 , {
     mesh: [rect, [0,0], [32,40]]
@@ -125,12 +113,19 @@ var player = game.createEntity(
   }
 )
 
+/* game loop */
+
 game.use(loop)
-game.use(keyboard)
 game.use(position)
-game.use(sprite)
-game.use(move)
+
+game.use(sprites.player)
+
+game.use(keyboard)
+game.use(arrows)
+game.use(directional)
+
 game.use(motion)
+
 game.use(smooth)
 game.use(dom)
 
@@ -138,9 +133,7 @@ game.on('init', function () {
   player.setSpriteFace('down')
 })
 
-game.on('keys', function (keys) {
-  player.keys = keys
-})
+/* end loop */
 
 game.applyComponents()
 game.init()
