@@ -17,7 +17,7 @@ var map = {
 module.exports = function (el) {
   var kbd = {}
 
-  kbd.keys = {}
+  kbd.keys = []
 
   kbd.init = function () {
 
@@ -26,27 +26,43 @@ module.exports = function (el) {
     el.addEventListener('keydown', function (ev) {
       ev.preventDefault()
       ev.stopPropagation()
-      kbd.keys[ev.which] = true
-      kbd.emit('keys', kbd.getKeys())
+      if (!kbd.isKeyPressed(ev.which)) {
+        kbd.keys.push(ev.which)
+        kbd.emit('keys', kbd.keys)
+      }
       return false
     })
 
     el.addEventListener('keyup', function (ev) {
       ev.preventDefault()
       ev.stopPropagation()
-      kbd.keys[ev.which] = false
-      kbd.emit('keys', kbd.getKeys())
+      if (kbd.isKeyPressed(ev.which)) {
+        kbd.keys.splice(kbd.keys.indexOf(ev.which), 1)
+        kbd.emit('keys', kbd.keys)
+      }
       return false
     })
 
   }
 
-  kbd.getKeys = function () {
-    return Object.keys(kbd.keys)
-      .filter(function (el) { return kbd.keys[el] })
-      .sort(function (a, b) { return a - b })
-      .map(function (el) { return map[el] })
-      .join(' ')
+  kbd.isKeyPressed = function (key) {
+    return !!~kbd.keys.indexOf(key)
+  }
+
+  kbd.getMappedKeys = function () {
+    return kbd.keys.map(function (el) { return map[el] })
+  }
+
+  kbd.satisfies = function (keymap, str) {
+    var m = str.split(' ')
+    var cnt = m.length
+    if (keymap.length !== cnt) return false
+    var p
+    while (p = m.shift()) {
+      if (~keymap.indexOf(p)) cnt--
+    }
+    if (cnt === 0) return true
+    else return false
   }
 
   return kbd

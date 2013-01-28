@@ -13,6 +13,9 @@
     "entity/motion": "*",
     "entity/position": "*",
     "entity/loop": "*",
+    "entity/directional": "*",
+    "entity/smooth": "*",
+    "entity/arrows": "*",
     "entity/dom": "*"
   },
   "scripts": ["index.js"]
