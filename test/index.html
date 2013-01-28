@@ -4,6 +4,9 @@
     <title>keyboard</title>
     <link rel="stylesheet" href="../build/build.css">
     <style>
+    body {
+      background: #5a2;
+    }
     #game {
       width: 360px;
       height: 256px;
@@ -85,10 +88,30 @@ var position = require('entity-position')
 
 var keyboard = require('keyboard')(document)
 
+var arrowKeys = ['left','up','right','down']
+var directional = {
+  dir: [v, 0,0]
+, update: function (e) {
+    if (!e.keys) {
+      e.setSpriteFace()
+      e.dir.set(0)
+      return
+    }
+    var arrows = e.keys
+      .split(' ')
+      .filter(function (el) { return !!~arrowKeys.indexOf(el) })
+      .join(' ')
+    if (!(arrows in inputMap)) {
+      return
+    }
+    e.setSpriteFace(arrows)
+    e.dir.set(v(inputMap[arrows]).mul(2))
+  }
+}
+
 var move = {
   update: function (e) {
-    e.setSpriteFace(e.keys)
-    e.vel.set(v(inputMap[e.keys]).mul(2,2))
+    e.vel.set(e.dir)
   }
 }
 
@@ -114,6 +137,7 @@ var player = game.createEntity(
 , motion
 , position
 , sprite
+, directional
 , move
 , smooth
 , {
@@ -126,6 +150,7 @@ game.use(loop)
 game.use(keyboard)
 game.use(position)
 game.use(sprite)
+game.use(directional)
 game.use(move)
 game.use(motion)
 game.use(smooth)
